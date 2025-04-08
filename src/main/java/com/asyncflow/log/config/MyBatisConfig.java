@@ -34,6 +34,9 @@ public class MyBatisConfig {
                 .getResources("classpath:mapper/*.xml")
         );
         
+        // 设置别名包
+        factoryBean.setTypeAliasesPackage("com.asyncflow.log.model.entity");
+        
         return factoryBean.getObject();
     }
 } 
