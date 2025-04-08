@@ -9,5 +9,6 @@ public class LogArchive {
     private Long fileId;
     private String archivePath;
     private LocalDateTime archiveTime;
+    private String archiveReason;
     private LocalDateTime createTime;
 } 

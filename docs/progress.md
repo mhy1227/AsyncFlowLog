@@ -2,11 +2,13 @@
 
 ## 当前状态
 
-- 项目初始化
-- 文档编写
+- 项目初始化完成
+- 文档编写完成
 - 架构设计完成
 - 基础框架类实现完成
-- 准备开始核心功能实现
+- 核心功能实现进行中
+- 数据库模块实现完成
+- 接口模块实现进行中
 
 ## 已完成工作
 
@@ -17,18 +19,26 @@
 - [x] 进度跟踪文档
 - [x] 技术栈分析文档
 - [x] 异步日志系统简明解释文档
+- [x] 数据库设计文档
+- [x] Git使用指南
+- [x] LogFileService分析文档
+- [x] LogIndexService分析文档
+- [x] LogArchiveService分析文档
 
 ### 设计
 - [x] 系统架构设计
 - [x] 核心模块划分
 - [x] 接口定义
 - [x] 配置规范
+- [x] 数据库设计
 
 ### 项目初始化
 - [x] 确定技术栈
 - [x] 确定项目结构
 - [x] 确定开发规范
 - [x] 确定版本控制策略
+- [x] 配置开发环境
+- [x] 配置数据库环境
 
 ### 基础框架
 - [x] 配置类
@@ -58,25 +68,25 @@
 - [x] 数据库脚本
   - [x] 初始化SQL
 
+### 数据库模块
+- [x] 实体类
+  - [x] LogFile.java
+  - [x] LogIndex.java
+  - [x] LogArchive.java
+- [x] Mapper层
+  - [x] LogFileMapper.java
+  - [x] LogIndexMapper.java
+  - [x] LogArchiveMapper.java
+- [x] Service层
+  - [x] LogFileService.java
+  - [x] LogIndexService.java
+  - [x] LogArchiveService.java
+- [x] Controller层
+  - [x] LogFileController.java
+  - [x] LogIndexController.java
+  - [x] LogArchiveController.java
+
 ## 待办事项
-
-### 环境配置
-- [x] 开发环境配置
-  - [x] JDK 8 安装和配置
-  - [x] Maven 3.6+ 安装和配置
-  - [x] IDE 环境配置
-  - [x] Git 环境配置
-
-- [x] 数据库环境配置
-  - [x] MySQL 安装和配置
-  - [x] 创建数据库和表
-  - [x] 配置数据库连接
-
-- [ ] 项目基础结构
-  - [x] 创建 Maven 项目
-  - [x] 配置 pom.xml
-  - [x] 创建基础目录结构
-  - [ ] 配置版本控制
 
 ### 核心功能实现
 - [ ] 日志事件模块
@@ -110,25 +120,6 @@
   - [ ] AsyncLogServiceFactory.java - 服务工厂类
   - [ ] 单元测试
 
-### 数据库模块
-- [ ] 实体类
-  - [ ] LogFile.java - 日志文件实体类
-  - [ ] LogIndex.java - 日志索引实体类
-  - [ ] LogArchive.java - 日志归档实体类
-  - [ ] 单元测试
-
-- [ ] Mapper层
-  - [ ] LogFileMapper.java - 日志文件Mapper接口
-  - [ ] LogIndexMapper.java - 日志索引Mapper接口
-  - [ ] LogArchiveMapper.java - 日志归档Mapper接口
-  - [ ] 单元测试
-
-### 接口模块
-- [ ] 控制器层
-  - [ ] LogController.java - 日志管理接口
-  - [ ] LogQueryController.java - 日志查询接口
-  - [ ] 单元测试
-
 ### 监控模块
 - [ ] 健康检查
   - [ ] AsyncLogHealthIndicator.java - 健康检查指标
@@ -145,15 +136,16 @@
    - 完成配置模块
    - 通过单元测试
 
-2. **M2: 核心功能完成** (进行中，预计完成时间：2024-04-22)
+2. **M2: 数据库模块完成** (已完成)
+   - 完成数据库表结构
+   - 完成实体类和Mapper
+   - 完成Service和Controller
+   - 通过单元测试
+
+3. **M3: 核心功能完成** (进行中，预计完成时间：2024-04-22)
    - 完成所有核心模块的基本实现
    - 通过单元测试
    - 提供基本使用示例
-
-3. **M3: 数据库支持完成** (预计完成时间：2024-04-29)
-   - 完成数据库模块
-   - 完成接口模块
-   - 提供扩展示例
 
 4. **M4: 监控告警完成** (预计完成时间：2024-05-06)
    - 完成监控模块
