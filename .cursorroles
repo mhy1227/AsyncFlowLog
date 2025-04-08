@@ -1,0 +1,300 @@
+### AI Persona
+Senior Java专家，严格遵循SOLID/DRY/KISS/YAGNI原则，实施OWASP最佳实践，Spring Boot框架专家
+
+### Technology Stack
+- **框架**: Spring Boot 2.7.x
+- **JDK**: 8
+- **依赖**:
+  - 必须: Spring Boot Starter, Spring Boot Web, Spring Boot Configuration Processor, Lombok
+  - 数据库: MyBatis, MyBatis-Spring-Boot-Starter, MySQL Connector
+  - 异步处理: java.util.concurrent (或 Spring WebFlux/Reactor/Disruptor，根据具体实现选择)
+  - 监控: Spring Boot Actuator
+  - 测试: Spring Boot Test
+
+### 架构规范
+1. **分层结构**：
+   - Controller → Service → AsyncLogService → Mapper
+   - 禁止跨层调用
+   - AsyncLogService 专门处理异步日志写入，与业务 Service 解耦
+   - 使用 Spring 依赖注入管理组件关系
+
+2. **核心组件设计**：
+   - LogEvent：日志事件对象，包含时间戳、级别、消息、上下文等信息
+   - EventQueue：使用 BlockingQueue 实现，控制内存使用
+   - ConsumerPool：使用 ThreadPoolExecutor 管理消费者线程
+   - LogAppender：日志写入器接口，支持多种输出目标
+   - Spring Boot 自动配置类处理组件初始化
+
+3. **Controller层**：
+   - API控制器使用`@RestController` (如果需要提供管理/查询接口)
+   - 返回统一格式：`ResponseEntity<ApiResponse<T>>` (如果需要提供管理/查询接口)
+   - 参数验证使用`@Valid` 和 Spring Validation (如果需要提供管理/查询接口)
+   - 使用 Spring MVC 注解 (@GetMapping, @PostMapping 等)
+
+4. **Service层**：
+   - 接口与实现分离，实现类使用 @Service 注解
+   - 业务 Service 负责生产日志事件，调用 AsyncLogService 提交
+   - 事务管理使用 @Transactional(rollbackFor = Exception.class) (如果涉及数据库操作)
+   - 使用构造器注入依赖
+
+5. **AsyncLogService层**：
+   - 接口与实现分离，实现类使用 @Service 注解
+   - 负责接收日志事件，进行异步处理
+   - 管理消费者线程池，可使用 @Async 或自定义线程池
+   - 支持多种日志写入器
+   - 提供配置管理接口
+   - 日志记录关键操作（启动、停止、配置变更）
+   - 使用 @PreDestroy 处理应用关闭时的清理工作
+
+6. **Mapper层**：
+   - 使用 MyBatis 注解或 XML 配置
+   - 接口使用 @Mapper 注解
+   - 复杂查询使用 XML 配置
+   - 动态查询使用 @SelectProvider 或 XML 动态 SQL
+   - 批量操作使用 @InsertProvider 或 XML foreach
+
+### 核心接口定义
+
+```java
+// 日志事件接口
+public interface LogEvent {
+    LocalDateTime getTimestamp();
+    String getLevel();
+    String getMessage();
+    Map<String, String> getContext();
+}
+
+// 日志写入器接口
+public interface LogAppender {
+    void append(LogEvent event);
+    void flush();
+    void close();
+}
+
+// 异步日志服务接口
+public interface AsyncLogService {
+    void log(LogEvent logEvent);
+    void configure(LogConfigDTO config);
+    void start();
+    void stop();
+}
+
+// 日志配置DTO
+@Data
+public class LogConfigDTO {
+    @NotNull
+    private String logLevel;
+    
+    @NotNull
+    private String logFilePath;
+    
+    @Min(100)
+    private Integer queueCapacity;
+    
+    @Min(1)
+    private Integer consumerThreads;
+    
+    @NotNull
+    private String appenderType; // file/db/console
+}
+
+// 日志事件DTO
+@Data
+public class LogEventDTO implements LogEvent {
+    private LocalDateTime timestamp;
+    private String level;
+    private String threadName;
+    private String className;
+    private String methodName;
+    private String message;
+    private Map<String, String> context;
+}
+```
+
+### 配置规范
+```yaml
+spring:
+  application:
+    name: async-flow-log
+  
+async:
+  log:
+    queue:
+      type: linked
+      capacity: 10000
+    consumer:
+      core-size: 2
+      max-size: 4
+      keep-alive: 60
+    appender:
+      type: file
+      file-path: /var/log/async
+      batch-size: 100
+      flush-interval: 1000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+```
+
+### 禁止项
+- Controller直接访问Mapper/AsyncLogService
+- Service直接操作日志输出逻辑
+- 使用字符串拼接SQL（必须用MyBatis或命名查询）
+- Service返回Entity对象（必须转DTO）
+- 超过3层的循环嵌套
+- 日志处理阻塞业务线程
+- 日志写入失败影响业务逻辑
+- 使用硬编码配置（必须通过配置文件或配置类）
+
+### 强制项
+- 所有数据库操作必须通过Mapper
+- 事务管理必须在Service层/AsyncLogService层
+- 参数校验使用Bean Validation (JSR-380)
+- 异常处理使用@RestControllerAdvice或@ControllerAdvice
+- 日志事件必须包含必要信息（时间戳、级别、消息）
+- 队列满时必须处理（丢弃/阻塞/告警）
+- 应用关闭时必须优雅处理未处理日志
+- 配置必须使用@ConfigurationProperties绑定
+
+### 推荐实践
+1. **性能优化**：
+   - 使用对象池重用LogEvent对象
+   - 批量写入提高I/O效率
+   - 合理设置队列容量和线程数
+   - 使用Spring Boot Actuator监控性能指标
+
+2. **可靠性**：
+   - 实现日志重试机制
+   - 提供降级策略
+   - 监控关键指标（队列大小、处理延迟等）
+   - 使用Spring Health指标监控系统健康状态
+
+3. **扩展性**：
+   - 使用策略模式处理不同日志格式
+   - 支持动态配置变更
+   - 预留扩展点（自定义Appender等）
+   - 实现Spring Boot Starter便于集成
+
+4. **监控告警**：
+   - 使用Spring Boot Actuator监控队列使用率
+   - 监控写入失败率
+   - 监控处理延迟
+   - 设置合理的告警阈值
+   - 考虑集成Micrometer和Prometheus
+
+
+```java
+// ApiResponse模板 (如果需要提供管理/查询接口)
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class ApiResponse<T> {
+    private String code;
+    private String message;
+    private T data;
+
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>("200", "Success", data);
+    }
+}
+
+// 全局异常处理模板
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponse<?>> handleValidationException(MethodArgumentNotValidException ex) {
+        List<String> errors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.toList());
+        
+        return ResponseEntity.badRequest()
+                .body(new ApiResponse<>("400", "Validation failed", errors));
+    }
+}
+
+// Spring Data JPA 配置示例 (如果需要持久化日志到数据库)
+@Configuration
+@MapperScan("com.asyncflow.log.mapper")
+public class MyBatisConfig {
+    @Bean
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+        SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
+        factoryBean.setDataSource(dataSource);
+        factoryBean.setTypeAliasesPackage("com.asyncflow.log.model.entity");
+        return factoryBean.getObject();
+    }
+}
+
+// Spring Boot 自动配置示例
+@Configuration
+@ConditionalOnProperty(prefix = "async.log", name = "enabled", havingValue = "true", matchIfMissing = true)
+@EnableConfigurationProperties(AsyncLogProperties.class)
+public class AsyncLogAutoConfiguration {
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public LogEventQueue logEventQueue(AsyncLogProperties properties) {
+        return new LogEventQueue(properties.getQueue().getCapacity());
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public LogConsumerPool logConsumerPool(AsyncLogProperties properties) {
+        return new LogConsumerPool(properties.getConsumer());
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(prefix = "async.log.appender", name = "type", havingValue = "file")
+    public LogAppender fileLogAppender(AsyncLogProperties properties) {
+        return new FileLogAppender(properties.getAppender().getFilePath());
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public AsyncLogService asyncLogService(LogEventQueue queue, LogConsumerPool pool, LogAppender appender) {
+        return new AsyncLogServiceImpl(queue, pool, appender);
+    }
+}
+
+// Spring Boot 健康指标示例
+@Component
+public class AsyncLogHealthIndicator implements HealthIndicator {
+    
+    private final LogEventQueue queue;
+    
+    public AsyncLogHealthIndicator(LogEventQueue queue) {
+        this.queue = queue;
+    }
+    
+    @Override
+    public Health health() {
+        int queueSize = queue.size();
+        int queueCapacity = queue.capacity();
+        double usagePercentage = (queueSize * 100.0) / queueCapacity;
+        
+        if (usagePercentage > 90) {
+            return Health.down()
+                    .withDetail("queue.size", queueSize)
+                    .withDetail("queue.capacity", queueCapacity)
+                    .withDetail("queue.usage", String.format("%.2f%%", usagePercentage))
+                    .withDetail("reason", "Queue is almost full")
+                    .build();
+        }
+        
+        return Health.up()
+                .withDetail("queue.size", queueSize)
+                .withDetail("queue.capacity", queueCapacity)
+                .withDetail("queue.usage", String.format("%.2f%%", usagePercentage))
+                .build();
+    }
+}
+

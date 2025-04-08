@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: async-flow-log
+  datasource:
+    url: jdbc:mysql://localhost:3306/async_log?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-pool-prepared-statement-per-connection-size: 20
+      filters: stat,wall
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.asyncflow.log.model.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+
+async:
+  log:
+    queue:
+      type: linked
+      capacity: 10000
+    consumer:
+      core-size: 2
+      max-size: 4
+      keep-alive: 60
+    appender:
+      type: file
+      file-path: logs/async
+      batch-size: 100
+      flush-interval: 1000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    com.asyncflow.log: DEBUG
+  file:
+    name: logs/asyncflow.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n" 
