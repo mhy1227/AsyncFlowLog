@@ -5,7 +5,8 @@
 - 项目初始化
 - 文档编写
 - 架构设计完成
-- 准备开始环境配置
+- 基础框架类实现完成
+- 准备开始核心功能实现
 
 ## 已完成工作
 
@@ -29,47 +30,53 @@
 - [x] 确定开发规范
 - [x] 确定版本控制策略
 
+### 基础框架
+- [x] 配置类
+  - [x] DataSourceConfig
+  - [x] ThreadPoolConfig
+  - [x] MyBatisConfig
+  - [x] AsyncLogConfig
+- [x] 工具类
+  - [x] DateUtils
+  - [x] StringUtils
+  - [x] JsonUtils
+  - [x] FileUtils
+- [x] 异常处理
+  - [x] ErrorCode
+  - [x] AsyncLogException
+  - [x] GlobalExceptionHandler
+  - [x] BizException
+- [x] 常量与枚举
+  - [x] LogConstants
+  - [x] LogLevel
+  - [x] LogFileStatus
+- [x] 通用模型
+  - [x] ApiResponse
+- [x] 配置文件
+  - [x] application.yml
+  - [x] mybatis-config.xml
+- [x] 数据库脚本
+  - [x] 初始化SQL
+
 ## 待办事项
 
 ### 环境配置
-- [ ] 开发环境配置
-  - [ ] JDK 8 安装和配置
-  - [ ] Maven 3.6+ 安装和配置
-  - [ ] IDE 环境配置
-  - [ ] Git 环境配置
+- [x] 开发环境配置
+  - [x] JDK 8 安装和配置
+  - [x] Maven 3.6+ 安装和配置
+  - [x] IDE 环境配置
+  - [x] Git 环境配置
 
-- [ ] 数据库环境配置
-  - [ ] MySQL 安装和配置
-  - [ ] 创建数据库和表
-  - [ ] 配置数据库连接
+- [x] 数据库环境配置
+  - [x] MySQL 安装和配置
+  - [x] 创建数据库和表
+  - [x] 配置数据库连接
 
 - [ ] 项目基础结构
-  - [ ] 创建 Maven 项目
-  - [ ] 配置 pom.xml
-  - [ ] 创建基础目录结构
+  - [x] 创建 Maven 项目
+  - [x] 配置 pom.xml
+  - [x] 创建基础目录结构
   - [ ] 配置版本控制
-
-### 基础框架搭建
-- [ ] 工具类模块
-  - [ ] DateUtils.java - 日期工具类
-  - [ ] StringUtils.java - 字符串工具类
-  - [ ] JsonUtils.java - JSON工具类
-  - [ ] BeanUtils.java - Bean工具类
-  - [ ] 单元测试
-
-- [ ] 异常处理模块
-  - [ ] AsyncLogException.java - 自定义异常类
-  - [ ] GlobalExceptionHandler.java - 全局异常处理器
-  - [ ] ErrorCode.java - 错误码枚举
-  - [ ] ApiResponse.java - 统一响应对象
-  - [ ] 单元测试
-
-- [ ] 配置模块
-  - [ ] AsyncLogConfig.java - 异步日志配置类
-  - [ ] QueueConfig.java - 队列配置类
-  - [ ] ConsumerConfig.java - 消费者配置类
-  - [ ] AppenderConfig.java - 日志写入器配置类
-  - [ ] 单元测试
 
 ### 核心功能实现
 - [ ] 日志事件模块
@@ -105,13 +112,15 @@
 
 ### 数据库模块
 - [ ] 实体类
-  - [ ] LogEntity.java - 日志实体类
-  - [ ] LogQuery.java - 日志查询条件类
+  - [ ] LogFile.java - 日志文件实体类
+  - [ ] LogIndex.java - 日志索引实体类
+  - [ ] LogArchive.java - 日志归档实体类
   - [ ] 单元测试
 
 - [ ] Mapper层
-  - [ ] LogMapper.java - 日志Mapper接口
-  - [ ] LogMapper.xml - 日志Mapper XML配置
+  - [ ] LogFileMapper.java - 日志文件Mapper接口
+  - [ ] LogIndexMapper.java - 日志索引Mapper接口
+  - [ ] LogArchiveMapper.java - 日志归档Mapper接口
   - [ ] 单元测试
 
 ### 接口模块
@@ -131,12 +140,12 @@
 
 ## 里程碑
 
-1. **M1: 基础框架完成** (预计完成时间：2024-04-15)
+1. **M1: 基础框架完成** (已完成)
    - 完成工具类和异常处理
    - 完成配置模块
    - 通过单元测试
 
-2. **M2: 核心功能完成** (预计完成时间：2024-04-22)
+2. **M2: 核心功能完成** (进行中，预计完成时间：2024-04-22)
    - 完成所有核心模块的基本实现
    - 通过单元测试
    - 提供基本使用示例
@@ -165,16 +174,10 @@
 
 ## 下一步计划
 
-1. 开始环境配置
-   - 配置开发环境
-   - 配置数据库环境
-   - 创建项目基础结构
+1. 开始核心功能实现
+   - 实现日志事件模块
+   - 实现队列管理模块
+   - 实现消费者线程池模块
 
-2. 开始基础框架搭建
-   - 实现工具类
-   - 实现异常处理
-   - 实现配置模块
-
-3. 开始核心功能实现
-4. 建立持续集成环境
-5. 准备测试环境 
+2. 建立持续集成环境
+3. 准备测试环境 
