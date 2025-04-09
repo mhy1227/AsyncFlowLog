@@ -48,6 +48,7 @@
 - [x] 配置规范
 - [x] 数据库设计
 - [x] AOP操作日志设计
+- [x] 监控模块设计
 
 ### 项目初始化
 - [x] 确定技术栈
@@ -128,14 +129,23 @@
   - [x] 测试配置类
   - [x] 单元测试
 
-### 问题修复
-- [x] MyBatis配置问题
-  - [x] 创建mapper目录
-  - [x] 添加空的Mapper XML文件
-  - [x] 修改MyBatisConfig增加错误处理
-- [x] 消费者线程池问题
-  - [x] 修改ConsumerConfig注入EventHandler
-  - [x] 设置事件处理器
+### 监控模块
+- [x] 健康检查
+  - [x] AsyncLogHealthIndicator.java - 健康检查指标
+  - [x] 单元测试
+
+- [x] 性能监控
+  - [x] AsyncLogMetrics.java - 性能指标
+  - [x] 单元测试
+  
+- [x] 监控API
+  - [x] AsyncLogMonitorController.java - 监控REST API
+  - [x] 单元测试
+
+- [x] 监控配置
+  - [x] Micrometer集成
+  - [x] Prometheus支持
+  - [x] 监控阈值配置
 
 ## 待办事项
 
@@ -190,11 +200,20 @@
 ### 监控模块
 - [x] 健康检查
   - [x] AsyncLogHealthIndicator.java - 健康检查指标
-  - [ ] 单元测试
+  - [x] 单元测试
 
-- [ ] 性能监控
-  - [ ] AsyncLogMetrics.java - 性能指标
-  - [ ] 单元测试
+- [x] 性能监控
+  - [x] AsyncLogMetrics.java - 性能指标
+  - [x] 单元测试
+  
+- [x] 监控API
+  - [x] AsyncLogMonitorController.java - 监控REST API
+  - [x] 单元测试
+
+- [x] 监控配置
+  - [x] Micrometer集成
+  - [x] Prometheus支持
+  - [x] 监控阈值配置
 
 ## 里程碑
 
@@ -259,3 +278,30 @@
 
 3. 建立持续集成环境
 4. 准备测试环境 
+
+### 已完成任务
+
+### 待完成任务
+
+### 里程碑
+- [x] 里程碑1：基础框架完成 (4月1日)
+- [x] 里程碑2：数据库模块完成 (4月3日)
+- [x] 里程碑3：核心功能完成 (4月7日)
+  - [x] 异步日志服务
+  - [x] 事件队列
+  - [x] 消费者线程池
+  - [x] 日志事件处理
+  - [x] AOP操作日志
+- [x] 里程碑4：监控与运维支持 (4月10日)
+  - [x] 健康检查
+  - [x] 指标监控
+  - [x] REST API
+  - [x] Prometheus集成
+- [ ] 里程碑5：完整系统集成 (4月15日)
+
+### 下一步计划
+1. 完善告警机制
+2. 开发Web管理界面
+3. 编写完整使用文档
+4. 性能测试与优化
+5. 部署与运维指南 

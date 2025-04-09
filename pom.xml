@@ -27,6 +27,7 @@
         <mysql.version>8.0.33</mysql.version>
         <druid.version>1.2.18</druid.version>
         <aspectj.version>1.9.19</aspectj.version>
+        <micrometer.version>1.10.9</micrometer.version>
     </properties>
 
     <dependencies>
@@ -99,6 +100,18 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        
+        <!-- Micrometer 核心依赖 -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
+        </dependency>
+        
+        <!-- Micrometer Prometheus 集成 -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
         <!-- 工具类 -->
