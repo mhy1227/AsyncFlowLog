@@ -28,6 +28,7 @@
 - [x] EventQueueModule分析文档
 - [x] ConsumerPoolModule分析文档
 - [x] LogAppenderModule分析文档
+- [x] AsyncLogServiceModule分析文档
 
 ### 设计
 - [x] 系统架构设计
@@ -54,6 +55,7 @@
   - [x] ConsumerConfig
   - [x] AppenderConfig
   - [x] EventHandlerConfig
+  - [x] AsyncLogServiceConfig
 - [x] 工具类
   - [x] DateUtils
   - [x] StringUtils
@@ -132,9 +134,11 @@
   - [x] FileAppender 实现类
   - [x] LogEventHandler 实现类
   - [x] AppenderFactory 工厂类
-- [ ] 异步日志服务模块
-  - [ ] AsyncLogService 接口
-  - [ ] AsyncLogServiceImpl 实现类
+- [x] 异步日志服务模块
+  - [x] AsyncLogService 接口
+  - [x] AsyncLogServiceImpl 实现类
+  - [x] AsyncLogServiceFactory 工厂类
+  - [x] AsyncLogServiceConfig 配置类
 
 ### 监控模块
 - [ ] 健康检查
@@ -158,7 +162,7 @@
    - 完成Service和Controller
    - 通过单元测试
 
-3. **M3: 核心功能完成** (进行中，预计完成时间：2024-04-22)
+3. **M3: 核心功能完成** (已完成，完成时间：2025-04-09)
    - 完成所有核心模块的基本实现
    - 通过单元测试
    - 提供基本使用示例
