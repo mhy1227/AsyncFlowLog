@@ -25,9 +25,11 @@ AsyncFlowLog 是一个基于 Spring Boot 的高性能异步日志管理系统，
 
 ### 环境要求
 
-- JDK 8+
+- JDK 21
 - Maven 3.6+
 - Spring Boot 2.7.x
+
+> **重要说明**：本项目使用Java 21开发，利用了虚拟线程等现代Java特性来提高性能。不支持在Java 8或其他旧版本Java上运行。如需了解详细的版本兼容性信息，请参阅[Java版本不兼容问题文档](docs/issues/java_version_incompatibility.md)。
 
 ### 依赖配置
 
