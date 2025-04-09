@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoSettings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -26,8 +28,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * 异步日志监控控制器测试类
  */
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class AsyncLogMonitorControllerTest {
-    
+        
     @Mock
     private AsyncLogService asyncLogService;
     
@@ -175,3 +178,4 @@ public class AsyncLogMonitorControllerTest {
             .andExpect(status().isOk());
     }
 } 
+

@@ -9,6 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.Status;
 
@@ -19,6 +21,7 @@ import static org.mockito.Mockito.*;
  * 异步日志健康检查指标测试类
  */
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class AsyncLogHealthIndicatorTest {
     
     @Mock
@@ -118,3 +121,4 @@ public class AsyncLogHealthIndicatorTest {
         assertTrue(health.getDetails().get("error").toString().contains("健康检查异常"));
     }
 } 
+

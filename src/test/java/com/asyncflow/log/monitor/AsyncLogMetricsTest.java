@@ -12,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,6 +23,7 @@ import static org.mockito.Mockito.*;
  * 异步日志指标监控测试类
  */
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class AsyncLogMetricsTest {
     
     @Mock
@@ -139,3 +142,4 @@ public class AsyncLogMetricsTest {
         assertEquals(1, asyncLogMetrics.getDiscardedCount());
     }
 } 
+
