@@ -26,6 +26,7 @@
 - [x] LogArchiveService分析文档
 - [x] LogEventModule分析文档
 - [x] EventQueueModule分析文档
+- [x] ConsumerPoolModule分析文档
 
 ### 设计
 - [x] 系统架构设计
@@ -49,6 +50,7 @@
   - [x] MyBatisConfig
   - [x] AsyncLogConfig
   - [x] QueueConfig
+  - [x] ConsumerConfig
 - [x] 工具类
   - [x] DateUtils
   - [x] StringUtils
@@ -104,11 +106,12 @@
   - [x] QueueFactory.java - 队列工厂类
   - [x] 单元测试
 
-- [ ] 消费者线程池模块
-  - [ ] ConsumerPool.java - 消费者线程池接口
-  - [ ] ThreadPoolConsumerPool.java - 基于ThreadPoolExecutor的实现
-  - [ ] ConsumerFactory.java - 消费者工厂类
-  - [ ] 单元测试
+- [x] 消费者线程池模块
+  - [x] ConsumerPool.java - 消费者线程池接口
+  - [x] EventHandler.java - 事件处理器接口
+  - [x] ThreadPoolConsumer.java - 基于ThreadPoolExecutor的实现
+  - [x] ConsumerFactory.java - 消费者工厂类
+  - [x] 单元测试
 
 - [ ] 日志写入器模块
   - [ ] LogAppender.java - 日志写入器接口
@@ -170,7 +173,6 @@
 ## 下一步计划
 
 1. 继续核心功能实现
-   - 实现消费者线程池模块
    - 实现日志写入器模块
    - 实现异步日志服务模块
 
