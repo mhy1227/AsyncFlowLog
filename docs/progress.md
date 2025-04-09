@@ -27,6 +27,7 @@
 - [x] LogEventModule分析文档
 - [x] EventQueueModule分析文档
 - [x] ConsumerPoolModule分析文档
+- [x] LogAppenderModule分析文档
 
 ### 设计
 - [x] 系统架构设计
@@ -51,6 +52,8 @@
   - [x] AsyncLogConfig
   - [x] QueueConfig
   - [x] ConsumerConfig
+  - [x] AppenderConfig
+  - [x] EventHandlerConfig
 - [x] 工具类
   - [x] DateUtils
   - [x] StringUtils
@@ -94,37 +97,44 @@
 ## 待办事项
 
 ### 核心功能实现
+- [x] 日志实体类
+  - [x] LogFile
+  - [x] LogIndex
+  - [x] LogArchive
+- [x] MyBatis映射接口
+  - [x] LogFileMapper
+  - [x] LogIndexMapper
+  - [x] LogArchiveMapper
+- [x] 服务接口和实现类
+  - [x] LogFileService
+  - [x] LogIndexService
+  - [x] LogArchiveService
+- [x] 控制器
+  - [x] LogFileController
+  - [x] LogIndexController
+  - [x] LogArchiveController
 - [x] 日志事件模块
-  - [x] LogEvent.java - 日志事件接口
-  - [x] LogEventDTO.java - 日志事件数据传输对象
-  - [x] LogEventFactory.java - 日志事件工厂类
-  - [x] 单元测试
-
+  - [x] LogEvent 接口
+  - [x] LogEventDTO 实现类
+  - [x] LogEventFactory 工厂类
 - [x] 队列管理模块
-  - [x] EventQueue.java - 事件队列接口
-  - [x] LinkedEventQueue.java - 基于LinkedBlockingQueue的实现
-  - [x] QueueFactory.java - 队列工厂类
-  - [x] 单元测试
-
+  - [x] EventQueue 接口
+  - [x] LinkedEventQueue 实现类
+  - [x] QueueFactory 工厂类
 - [x] 消费者线程池模块
-  - [x] ConsumerPool.java - 消费者线程池接口
-  - [x] EventHandler.java - 事件处理器接口
-  - [x] ThreadPoolConsumer.java - 基于ThreadPoolExecutor的实现
-  - [x] ConsumerFactory.java - 消费者工厂类
-  - [x] 单元测试
-
-- [ ] 日志写入器模块
-  - [ ] LogAppender.java - 日志写入器接口
-  - [ ] FileAppender.java - 文件写入器实现
-  - [ ] DatabaseAppender.java - 数据库写入器实现
-  - [ ] AppenderFactory.java - 写入器工厂类
-  - [ ] 单元测试
-
+  - [x] ConsumerPool 接口
+  - [x] EventHandler 接口
+  - [x] ThreadPoolConsumer 实现类
+  - [x] ConsumerFactory 工厂类
+- [x] 日志写入器模块
+  - [x] LogAppender 接口
+  - [x] AbstractLogAppender 抽象类
+  - [x] FileAppender 实现类
+  - [x] LogEventHandler 实现类
+  - [x] AppenderFactory 工厂类
 - [ ] 异步日志服务模块
-  - [ ] AsyncLogService.java - 异步日志服务接口
-  - [ ] AsyncLogServiceImpl.java - 异步日志服务实现类
-  - [ ] AsyncLogServiceFactory.java - 服务工厂类
-  - [ ] 单元测试
+  - [ ] AsyncLogService 接口
+  - [ ] AsyncLogServiceImpl 实现类
 
 ### 监控模块
 - [ ] 健康检查
