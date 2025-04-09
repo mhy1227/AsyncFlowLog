@@ -168,4 +168,10 @@ public interface AsyncLogService {
      * 刷新所有日志，确保写入
      */
     void flush();
+    
+    /**
+     * 检查异步日志服务是否正在运行
+     * @return 如果服务正在运行返回true，否则返回false
+     */
+    boolean isRunning();
 } 

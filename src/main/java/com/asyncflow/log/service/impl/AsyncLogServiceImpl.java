@@ -266,4 +266,9 @@ public class AsyncLogServiceImpl implements AsyncLogService {
     public int getActiveThreadCount() {
         return consumerPool.getActiveCount();
     }
+    
+    @Override
+    public boolean isRunning() {
+        return running.get();
+    }
 } 
