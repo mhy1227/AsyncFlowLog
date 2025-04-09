@@ -2,6 +2,7 @@ package com.asyncflow.log.config;
 
 import com.asyncflow.log.consumer.ConsumerFactory;
 import com.asyncflow.log.consumer.ConsumerPool;
+import com.asyncflow.log.consumer.EventHandler;
 import com.asyncflow.log.queue.EventQueue;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class ConsumerConfig {
     @Autowired
     private EventQueue eventQueue;
     
+    @Autowired
+    private EventHandler eventHandler;
+    
     /**
      * 创建并注册消费者线程池实例
      * 
@@ -34,6 +38,9 @@ public class ConsumerConfig {
         
         // 设置事件队列
         consumerPool.setEventQueue(eventQueue);
+        
+        // 设置事件处理器
+        consumerPool.setEventHandler(eventHandler);
         
         return consumerPool;
     }

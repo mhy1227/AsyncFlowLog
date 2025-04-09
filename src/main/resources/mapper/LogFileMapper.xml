@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.asyncflow.log.mapper.LogFileMapper">
+    <!-- 由于LogFileMapper接口可能已经使用了注解方式定义SQL，此XML文件可以为空 -->
+    <!-- 这个文件的存在是为了满足MyBatis配置中的classpath:mapper/*.xml资源检查 -->
+</mapper> 
