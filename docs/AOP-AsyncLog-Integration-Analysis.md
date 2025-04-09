@@ -306,4 +306,167 @@ AsyncFlowLog项目采用了分层设计模式：
 
 AOP操作日志与异步日志系统的集成是一个典型的分层架构设计案例。底层提供高性能的异步处理基础设施，上层提供符合业务需求的审计和跟踪能力。这种设计不仅满足了功能需求，也兼顾了性能和可维护性。
 
-通过AOP实现的非侵入式日志记录，使得开发人员可以专注于业务逻辑，同时获得完整的操作审计能力。而异步处理机制则确保了系统在高并发场景下的稳定性和响应速度。这种集成方式值得在类似需要兼顾性能和审计功能的系统中参考和应用。 
+通过AOP实现的非侵入式日志记录，使得开发人员可以专注于业务逻辑，同时获得完整的操作审计能力。而异步处理机制则确保了系统在高并发场景下的稳定性和响应速度。这种集成方式值得在类似需要兼顾性能和审计功能的系统中参考和应用。
+
+## 10. 健康监控分析
+
+异步日志系统的健康监控是确保系统可靠运行的关键组成部分。本节分析系统中实现的各种监控组件及其功能。
+
+### 10.1 监控组件架构
+
+```
+┌─────────────────┐    ┌───────────────────┐    ┌─────────────────┐
+│  Spring Actuator │───▶│HealthIndicator API│───▶│  监控管理平台   │
+└─────────────────┘    └───────────────────┘    └─────────────────┘
+         │                       │                      │
+         │                       │                      │
+         ▼                       ▼                      ▼
+┌─────────────────┐    ┌───────────────────┐    ┌─────────────────┐
+│AsyncLogMetrics  │    │AsyncLogHealth     │    │ 告警通知系统    │
+│ (MeterBinder)   │    │ Indicator         │    │                 │
+└─────────────────┘    └───────────────────┘    └─────────────────┘
+         │                       │                      
+         │                       │                      
+         ▼                       ▼                      
+┌─────────────────────────────────────────────────────┐
+│               异步日志核心组件                       │
+│  (AsyncLogService, EventQueue, ConsumerPool)        │
+└─────────────────────────────────────────────────────┘
+```
+
+### 10.2 健康检查指标（AsyncLogHealthIndicator）
+
+`AsyncLogHealthIndicator` 实现了 Spring Boot Actuator 的 `HealthIndicator` 接口，提供了异步日志系统的健康状态评估：
+
+```java
+@Component
+public class AsyncLogHealthIndicator implements HealthIndicator {
+    
+    // 队列使用率警告阈值（80%）
+    private static final double QUEUE_USAGE_WARN_THRESHOLD = 0.8;
+    
+    // 队列使用率危险阈值（95%）
+    private static final double QUEUE_USAGE_DANGER_THRESHOLD = 0.95;
+    
+    @Autowired
+    private AsyncLogService asyncLogService;
+    
+    @Autowired
+    private EventQueue eventQueue;
+    
+    @Autowired
+    private ConsumerPool consumerPool;
+    
+    @Override
+    public Health health() {
+        // 实现健康检查逻辑...
+    }
+}
+```
+
+健康状态分为三个级别：
+- **UP**：系统正常运行（队列使用率低于80%）
+- **OUT_OF_SERVICE**：系统处于警告状态（队列使用率在80%-95%之间）
+- **DOWN**：系统处于故障状态（队列使用率超过95%、消费者线程池关闭或服务未运行）
+
+### 10.3 指标监控（AsyncLogMetrics）
+
+`AsyncLogMetrics` 实现了 Micrometer 的 `MeterBinder` 接口，向监控系统提供多种指标：
+
+```java
+@Component
+@ConditionalOnClass(MeterBinder.class)
+@ConditionalOnProperty(prefix = "async.log.monitor", name = "metrics.enabled", 
+                       havingValue = "true", matchIfMissing = true)
+public class AsyncLogMetrics implements MeterBinder {
+    
+    // 注册各种指标...
+    @Override
+    public void bindTo(MeterRegistry registry) {
+        // 队列指标
+        Gauge.builder("asynclog.queue.size", eventQueue, EventQueue::size)
+             .description("异步日志队列当前大小")
+             .register(registry);
+             
+        // 更多指标注册...
+    }
+}
+```
+
+主要指标类型包括：
+1. **队列指标**：大小、容量、使用率
+2. **消费者指标**：活跃线程数、已完成任务数
+3. **服务状态指标**：是否运行中
+4. **事件处理指标**：成功数、失败数、丢弃数、成功率
+
+### 10.4 监控接口（AsyncLogMonitorController）
+
+系统提供了RESTful API接口用于查询异步日志系统的状态和指标：
+
+```java
+@RestController
+@RequestMapping("/api/asynclog/monitor")
+@ConditionalOnProperty(prefix = "async.log.monitor", name = "api.enabled", 
+                      havingValue = "true", matchIfMissing = true)
+public class AsyncLogMonitorController {
+    
+    @GetMapping("/status")
+    public ResponseEntity<Map<String, Object>> getStatus() {
+        // 返回系统状态信息...
+    }
+    
+    @GetMapping("/metrics")
+    public ResponseEntity<Map<String, Object>> getMetrics() {
+        // 返回指标数据...
+    }
+    
+    @GetMapping("/info")
+    public ResponseEntity<Map<String, Object>> getInfo() {
+        // 返回系统信息...
+    }
+}
+```
+
+这些接口提供了三类信息：
+- **状态信息**：服务运行状态、队列状态、消费者线程池状态
+- **指标数据**：事件处理成功率、失败率等性能指标
+- **系统信息**：JVM内存使用、线程数等系统资源指标
+
+### 10.5 配置与集成
+
+Spring Boot Actuator配置：
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+```
+
+这种配置使得系统健康状态可以通过标准的Actuator端点（如`/actuator/health`）访问，便于与监控系统集成。
+
+### 10.6 监控最佳实践建议
+
+1. **阈值调整**：根据实际系统负载情况，调整队列使用率的警告阈值（QUEUE_USAGE_WARN_THRESHOLD）和危险阈值（QUEUE_USAGE_DANGER_THRESHOLD）。
+
+2. **监控指标扩展**：考虑增加以下指标：
+   - 日志处理延迟时间
+   - 队列增长率
+   - 消费者线程池拒绝任务次数
+   - 各类型日志的分布比例
+
+3. **告警集成**：与邮件、短信或企业消息系统（如钉钉、企业微信）集成，实现自动告警功能。
+
+4. **可视化监控**：利用Grafana等工具，基于Micrometer指标创建直观的监控面板，展示：
+   - 队列使用率趋势图
+   - 处理成功率历史曲线
+   - 系统资源使用情况
+   - 关键指标的阈值告警
+
+5. **分布式追踪**：考虑与Sleuth和Zipkin等工具集成，实现日志事件的全链路追踪，特别是在微服务架构中。
+
+这些监控功能的完善将有助于提高异步日志系统的可靠性和可维护性，使开发和运维团队能够及时发现和解决潜在问题。 
