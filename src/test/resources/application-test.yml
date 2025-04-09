@@ -1,0 +1,68 @@
+spring:
+  # 允许Bean定义覆盖
+  main:
+    allow-bean-definition-overriding: true
+  
+  # 禁用Spring Web自动配置
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+    
+  # 使用H2内存数据库进行测试
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password: 
+    driver-class-name: org.h2.Driver
+  
+  # SQL初始化配置
+  sql:
+    init:
+      schema-locations: classpath:schema-h2.sql
+      mode: embedded
+  
+  # 测试中自动创建表结构
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+  
+  # 禁用Flyway在测试中运行
+  flyway:
+    enabled: false
+
+# 测试环境特定配置
+test:
+  enabled: true
+
+# 异步日志配置
+async:
+  log:
+    queue:
+      type: linked
+      capacity: 1000
+    consumer:
+      core-size: 1
+      max-size: 2
+      keep-alive: 10
+    appender:
+      type: memory  # 使用内存类型的appender，不写入真实文件
+      file-path: ./logs/test
+      batch-size: 10
+      flush-interval: 100
+
+# Web服务器配置，使用随机端口
+server:
+  port: 0
+  error:
+    include-message: always
+    include-exception: true
+
+# 测试环境日志配置
+logging:
+  level:
+    com.asyncflow.log: DEBUG
+    org.springframework.test: INFO
+    org.hibernate: INFO
+    org.springframework.web: DEBUG 

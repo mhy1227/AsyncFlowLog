@@ -26,6 +26,7 @@
         <mybatis.version>2.3.1</mybatis.version>
         <mysql.version>8.0.33</mysql.version>
         <druid.version>1.2.18</druid.version>
+        <aspectj.version>1.9.19</aspectj.version>
     </properties>
 
     <dependencies>
@@ -39,6 +40,25 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- AOP 支持 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        
+        <!-- AspectJ 依赖 -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+            <version>${aspectj.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+            <version>${aspectj.version}</version>
         </dependency>
 
         <!-- MyBatis 支持 -->
