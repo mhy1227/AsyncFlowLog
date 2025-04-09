@@ -130,6 +130,8 @@ management:
 - [模块分析](docs/asyncflowlog_anaysis.md)
 - [进度跟踪](docs/progress.md)
 - [技术栈分析](docs/tech_stack_analysis.md)
+- [Java版本不兼容问题](docs/issues/java_version_incompatibility.md)
+- [Git与IDE配置文件管理指南](docs/git_ide_management.md)
 
 ## 开发计划
 

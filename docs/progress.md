@@ -10,6 +10,7 @@
 - 数据库模块实现完成
 - 接口模块实现进行中
 - Java版本兼容性问题已解决
+- Git与IDE配置已优化
 
 ## 已完成工作
 
@@ -31,6 +32,7 @@
 - [x] LogAppenderModule分析文档
 - [x] AsyncLogServiceModule分析文档
 - [x] Java版本不兼容问题文档
+- [x] Git与IDE配置文件管理指南
 
 ### 设计
 - [x] 系统架构设计
