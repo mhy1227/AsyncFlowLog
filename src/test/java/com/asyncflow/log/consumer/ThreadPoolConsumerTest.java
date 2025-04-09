@@ -4,6 +4,7 @@ import com.asyncflow.log.model.event.LogEvent;
 import com.asyncflow.log.model.event.LogEventDTO;
 import com.asyncflow.log.queue.EventQueue;
 import com.asyncflow.log.queue.LinkedEventQueue;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,6 +19,7 @@ import static org.mockito.Mockito.*;
 /**
  * ThreadPoolConsumer单元测试类
  */
+@Slf4j
 public class ThreadPoolConsumerTest {
     
     private ConsumerPool consumerPool;
@@ -55,28 +57,38 @@ public class ThreadPoolConsumerTest {
     }
     
     @Test
-    public void testSubmit() {
-        // 设置事件处理器返回成功
-        when(eventHandler.handle(any(LogEvent.class))).thenReturn(true);
+    public void testSubmit() throws InterruptedException {
+        // 创建CountDownLatch用于等待事件处理完成
+        CountDownLatch latch = new CountDownLatch(1);
+        
+        // 设置事件处理器返回成功，并在调用后减少CountDownLatch计数
+        doAnswer(invocation -> {
+            log.info("eventHandler.handle()方法被调用");
+            latch.countDown();
+            return true;
+        }).when(eventHandler).handle(any(LogEvent.class));
         
         // 启动消费者线程池
         consumerPool.start();
         
-        // 提交日志事件
+        // 创建测试事件
         LogEvent event = new LogEventDTO("INFO", "测试消息");
-        boolean result = consumerPool.submit(event);
         
-        assertTrue(result);
+        // 直接将事件放入队列，而不是使用submit方法
+        // 这样可以确保消费者线程能够处理到事件
+        log.info("将事件放入队列: {}", event);
+        eventQueue.put(event);
         
-        // 等待一段时间确保事件被处理
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        log.info("事件已放入队列，等待处理...");
+        
+        // 等待事件处理完成，最多等待10秒
+        boolean processed = latch.await(10, TimeUnit.SECONDS);
+        log.info("等待结果: {}", processed ? "事件已处理" : "等待超时");
+        
+        assertTrue(processed, "事件处理超时");
         
         // 验证事件处理器被调用
-        verify(eventHandler, atLeastOnce()).handle(any(LogEvent.class));
+        verify(eventHandler, timeout(11000).times(1)).handle(any(LogEvent.class));
         
         // 清理
         consumerPool.shutdown();

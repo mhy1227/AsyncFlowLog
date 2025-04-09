@@ -3,6 +3,7 @@ package com.asyncflow.log.service;
 import com.asyncflow.log.consumer.ConsumerPool;
 import com.asyncflow.log.consumer.EventHandler;
 import com.asyncflow.log.model.event.LogEvent;
+import com.asyncflow.log.model.event.LogEventDTO;
 import com.asyncflow.log.model.event.LogEventFactory;
 import com.asyncflow.log.queue.EventQueue;
 import com.asyncflow.log.service.impl.AsyncLogServiceImpl;
@@ -17,6 +18,8 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -34,20 +37,20 @@ public class AsyncLogServiceTest {
     private ConsumerPool consumerPool;
     
     @Mock
-    private LogEvent mockEvent;
+    private LogEventDTO mockEventDTO;
     
     @InjectMocks
     private AsyncLogServiceImpl asyncLogService;
     
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         
         // 设置eventFactory默认行为
-        when(eventFactory.createLogEvent(anyString(), anyString())).thenReturn(mockEvent);
-        when(eventFactory.createLogEvent(anyString(), anyString(), any(Map.class))).thenReturn(mockEvent);
-        when(eventFactory.createLogEventWithException(anyString(), anyString(), anyString())).thenReturn(mockEvent);
-        when(eventFactory.createFullLogEvent(anyString(), anyString(), any(Map.class), anyString(), anyString(), anyString())).thenReturn(mockEvent);
+        when(eventFactory.createLogEvent(anyString(), anyString())).thenReturn(mockEventDTO);
+        when(eventFactory.createLogEvent(anyString(), anyString(), anyMap())).thenReturn(mockEventDTO);
+        when(eventFactory.createLogEventWithException(anyString(), anyString(), anyString())).thenReturn(mockEventDTO);
+        when(eventFactory.createFullLogEvent(anyString(), anyString(), anyMap(), anyString(), anyString(), anyString())).thenReturn(mockEventDTO);
         
         // 设置eventQueue默认行为
         try {
@@ -93,7 +96,7 @@ public class AsyncLogServiceTest {
         assertTrue(result);
         verify(eventFactory).createLogEvent("INFO", "测试消息");
         try {
-            verify(eventQueue).offer(mockEvent);
+            verify(eventQueue).offer(mockEventDTO);
         } catch (InterruptedException e) {
             fail("验证失败");
         }
@@ -113,7 +116,7 @@ public class AsyncLogServiceTest {
         assertTrue(result);
         verify(eventFactory).createLogEvent("INFO", "测试消息", context);
         try {
-            verify(eventQueue).offer(mockEvent);
+            verify(eventQueue).offer(mockEventDTO);
         } catch (InterruptedException e) {
             fail("验证失败");
         }
@@ -128,7 +131,7 @@ public class AsyncLogServiceTest {
         assertTrue(result);
         verify(eventFactory).createLogEventWithException("ERROR", "测试异常", "NullPointerException");
         try {
-            verify(eventQueue).offer(mockEvent);
+            verify(eventQueue).offer(mockEventDTO);
         } catch (InterruptedException e) {
             fail("验证失败");
         }
