@@ -24,6 +24,8 @@
 - [x] LogFileService分析文档
 - [x] LogIndexService分析文档
 - [x] LogArchiveService分析文档
+- [x] LogEventModule分析文档
+- [x] EventQueueModule分析文档
 
 ### 设计
 - [x] 系统架构设计
@@ -46,6 +48,7 @@
   - [x] ThreadPoolConfig
   - [x] MyBatisConfig
   - [x] AsyncLogConfig
+  - [x] QueueConfig
 - [x] 工具类
   - [x] DateUtils
   - [x] StringUtils
@@ -89,17 +92,17 @@
 ## 待办事项
 
 ### 核心功能实现
-- [ ] 日志事件模块
-  - [ ] LogEvent.java - 日志事件接口
-  - [ ] LogEventDTO.java - 日志事件数据传输对象
-  - [ ] LogEventBuilder.java - 日志事件构建器
-  - [ ] 单元测试
+- [x] 日志事件模块
+  - [x] LogEvent.java - 日志事件接口
+  - [x] LogEventDTO.java - 日志事件数据传输对象
+  - [x] LogEventFactory.java - 日志事件工厂类
+  - [x] 单元测试
 
-- [ ] 队列管理模块
-  - [ ] EventQueue.java - 事件队列接口
-  - [ ] LinkedEventQueue.java - 基于LinkedBlockingQueue的实现
-  - [ ] QueueFactory.java - 队列工厂类
-  - [ ] 单元测试
+- [x] 队列管理模块
+  - [x] EventQueue.java - 事件队列接口
+  - [x] LinkedEventQueue.java - 基于LinkedBlockingQueue的实现
+  - [x] QueueFactory.java - 队列工厂类
+  - [x] 单元测试
 
 - [ ] 消费者线程池模块
   - [ ] ConsumerPool.java - 消费者线程池接口
@@ -166,10 +169,10 @@
 
 ## 下一步计划
 
-1. 开始核心功能实现
-   - 实现日志事件模块
-   - 实现队列管理模块
+1. 继续核心功能实现
    - 实现消费者线程池模块
+   - 实现日志写入器模块
+   - 实现异步日志服务模块
 
 2. 建立持续集成环境
 3. 准备测试环境 
