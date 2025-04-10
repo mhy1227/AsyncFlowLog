@@ -146,9 +146,9 @@
 
 ## 相关文档
 
-- [Java版本不兼容问题记录](./issues/java_version_incompatibility.md)
-- [项目进度跟踪](./progress.md)
-- [技术栈分析](./tech_stack_analysis.md)
+- [Java版本不兼容问题记录](../issues/java_version_incompatibility.md)
+- [项目进度跟踪](../progress.md)
+- [技术栈分析](tech_stack_analysis.md)
 
 ## 结论
 
