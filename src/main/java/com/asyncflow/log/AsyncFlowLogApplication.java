@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@MapperScan("com.asyncflow.log.mapper")
+// @MapperScan("com.asyncflow.log.mapper")
 @EnableConfigurationProperties
 public class AsyncFlowLogApplication {
     public static void main(String[] args) {
