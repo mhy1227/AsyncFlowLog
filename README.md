@@ -168,3 +168,46 @@ management:
 
 MIT License - [配置参数指南](codex-doc/async_log_config_guide.md)
 - [JMeter 压测指南](codex-doc/20251022/jmter/jmeter_pressure_test.md)
+
+## 定时清理与归档（Scheduler）
+
+- 作用：按 cron 周期对历史日志执行“先归档（zip 到归档目录）再清理（删除）”，仅处理严格早于今天的文件；默认关闭，独立线程池不影响主流水线。
+- 快速启用（生产示例）：
+  ```yaml
+  async:
+    log:
+      maintenance:
+        enabled: true
+        cron: "0 5 2 * * ?"       # 每日 02:05 执行
+        timezone: "Asia/Shanghai"
+      retention:
+        days: 14                  # 留存天数（含今天）
+      archive:
+        enabled: true
+        dir: logs/archive         # 归档目录
+        days: 3                   # 归档阈值天数（建议 < retention.days）
+        compress: zip             # 目前仅支持 zip
+      file:
+        path: logs/async          # 与写入器目录保持一致
+  ```
+- 本地测试可将 cron 设为 `0/15 * * * * ?`（每 15 秒）便于观察，验证通过后改回每日或关闭开关。
+- 更多说明：
+  - 参数说明：`codex-doc/SchedulerDesign/parameters.md`
+  - 使用指南：`codex-doc/SchedulerDesign/quickstart.md`
+  - 实现说明：`codex-doc/SchedulerDesign/implementation.md`
+
+## 整体流程图（Mermaid）
+
+- 主流水线与定时维护的可视化流程，见：`codex-doc/diagrams/overview.md`
+- 包含：
+  - 日志生产（业务/AsyncLogService/@OperationLog）→ 队列 → 消费者线程池 → 事件处理器 → 写入器（FileAppender/可扩展）
+  - 定时任务（归档+清理）：Cron 触发 → 扫描目录 → 判定删除/归档/跳过 → 汇总统计
+
+- 更多图示：
+  - 主链路时序：`codex-doc/diagrams/main_sequence.md`
+  - 优雅停机时序：`codex-doc/diagrams/shutdown_sequence.md`
+  - 定时任务时序：`codex-doc/diagrams/scheduler_sequence.md`
+  - 定时任务异常流：`codex-doc/diagrams/scheduler_error_flow.md`
+  - 组件关系：`codex-doc/diagrams/components.md`
+  - 部署视图：`codex-doc/diagrams/deployment.md`
+  - 文件轮转状态：`codex-doc/diagrams/file_rotation_state.md`
