@@ -166,4 +166,5 @@ management:
 
 ## 许可证
 
-MIT License 
+MIT License - [配置参数指南](codex-doc/async_log_config_guide.md)
+- [JMeter 压测指南](codex-doc/20251022/jmter/jmeter_pressure_test.md)
