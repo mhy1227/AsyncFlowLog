@@ -25,12 +25,23 @@
   - 是否开启归档（在删除前，对达到归档阈值的历史文件先压缩到归档目录，再删除源文件）。
 - async.log.archive.dir（字符串，默认 logs/archive）
   - 归档文件存放目录；不存在会自动创建。
+- async.log.archive.raw-dir（字符串，默认 logs/archive/raw）
+  - 原始 .log 的迁移目录（当采用“归档后保留原始”策略时使用）。
 - async.log.archive.days（整数，默认 3，建议 < retention.days）
   - 归档阈值（含今天）。归档范围为：
     - 今天 − retention.days < 文件日期 ≤ 今天 − archive.days（且严格早于今天）。
     - 更早的文件已进入“删除”分支；更近的文件暂不处理。
 - async.log.archive.compress（字符串，默认 zip）
   - 归档压缩格式；当前实现仅支持 zip（归档产物命名为 `原文件名.log.zip`）。
+
+## 2.1 归档策略说明（当前默认）
+- 行为：满足归档阈值的历史日志会被压缩为 zip 到 `async.log.archive.dir`，同时“原始 .log”会被迁移到 `async.log.archive.raw-dir`（保留原始文本，便于审计/对比）。
+- 当天文件永不处理；仅处理“严格早于今天”的文件。
+- 删除策略：达到“删除阈值（retention.days）”的文件直接删除（不会再归档）。
+- 建议：为 `raw-dir` 目录配置单独的留存与外部清理（运维层面，例如按 7/14 天再清理）。
+ - 重名处理：若目标目录已存在同名文件，系统会在文件名中追加时间戳后再落盘，例如：
+   - `async-log-2025-10-23.log.zip` → `async-log-2025-10-23.log.20251024-070501.zip`
+   - `async-log-2025-10-23.log`（raw）→ `async-log-2025-10-23.20251024-070501.log`
 
 ## 3. 推荐配置
 - 生产环境（示例）

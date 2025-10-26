@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.io.IOException;
 import java.nio.file.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,6 +52,12 @@ public class LogRetentionScheduler {
     private String archiveDir;
 
     /**
+     * 原始日志迁移目录（当采用“归档后保留并迁移源文件”策略时使用）。
+     */
+    @Value("${async.log.archive.raw-dir:logs/archive/raw}")
+    private String archiveRawDir;
+
+    /**
      * 归档阈值天数（含今天）；早于该阈值的历史文件将被归档。
      * 注意：应小于保留天数（例如 archive.days=3, retention.days=7）。
      */
@@ -65,6 +72,7 @@ public class LogRetentionScheduler {
 
     private static final Pattern FILE_PATTERN = Pattern.compile("^async-log-(\\d{4}-\\d{2}-\\d{2})\\.log$");
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter TS_FMT = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss");
 
     /**
      * 每日定时触发（默认 02:05, Asia/Shanghai）。
@@ -131,13 +139,29 @@ public class LogRetentionScheduler {
                         Path archivedPath = archiveFile(p);
                         if (archivedPath != null) {
                             archived.incrementAndGet();
-                            // 归档成功后删除源文件
+                            // 归档成功后迁移源文件到原始归档目录（保留原始）
                             try {
-                                Files.deleteIfExists(p);
-                            } catch (IOException del) {
-                                log.warn("归档后删除源文件失败: {} - {}", p.toAbsolutePath(), del.getMessage());
+                                Path rawBase = Paths.get(archiveRawDir);
+                                if (!Files.exists(rawBase)) {
+                                    Files.createDirectories(rawBase);
+                                }
+                                Path rawTarget = rawBase.resolve(p.getFileName());
+                                if (Files.exists(rawTarget)) {
+                                    String rawName = p.getFileName().toString();
+                                    String ts = LocalDateTime.now().format(TS_FMT);
+                                    int dot = rawName.lastIndexOf('.');
+                                    String renamedRaw = (dot > 0)
+                                            ? rawName.substring(0, dot) + "." + ts + rawName.substring(dot)
+                                            : rawName + "." + ts;
+                                    rawTarget = rawBase.resolve(renamedRaw);
+                                }
+                                Files.move(p, rawTarget, StandardCopyOption.REPLACE_EXISTING);
+                                log.info("已归档并迁移源日志文件: {} -> {}, 原始迁移到: {}",
+                                        p.toAbsolutePath(), archivedPath.toAbsolutePath(), rawTarget.toAbsolutePath());
+                            } catch (IOException moveEx) {
+                                errors.incrementAndGet();
+                                log.warn("归档成功但迁移源文件失败: {} - {}", p.toAbsolutePath(), moveEx.getMessage());
                             }
-                            log.info("已归档历史日志文件: {} -> {}", p.toAbsolutePath(), archivedPath.toAbsolutePath());
                         } else {
                             skipped.incrementAndGet();
                         }
@@ -178,8 +202,12 @@ public class LogRetentionScheduler {
         String zipName = source.getFileName().toString() + ".zip";
         Path target = archiveBase.resolve(zipName);
         if (Files.exists(target)) {
-            // 已存在同名归档，避免重复
-            return target;
+            String ts = LocalDateTime.now().format(TS_FMT);
+            int pos = zipName.lastIndexOf(".zip");
+            String renamed = (pos > 0)
+                    ? zipName.substring(0, pos) + "." + ts + ".zip"
+                    : zipName + "." + ts + ".zip";
+            target = archiveBase.resolve(renamed);
         }
 
         try (java.util.zip.ZipOutputStream zos = new java.util.zip.ZipOutputStream(Files.newOutputStream(target));

@@ -211,3 +211,78 @@ MIT License - [配置参数指南](codex-doc/async_log_config_guide.md)
   - 组件关系：`codex-doc/diagrams/components.md`
   - 部署视图：`codex-doc/diagrams/deployment.md`
   - 文件轮转状态：`codex-doc/diagrams/file_rotation_state.md`
+
+## 开发扩展与排查
+- Appender 扩展开发指南：`codex-doc/guide/appender_extension.md`
+- 定时任务故障排查：`codex-doc/SchedulerDesign/troubleshooting.md`
+
+## 主链路时序图（Mermaid）
+
+```mermaid
+sequenceDiagram
+  participant Client
+  participant Controller
+  participant AOP as OperationLogAspect
+  participant ALS as AsyncLogService
+  participant EQ as EventQueue
+  participant CPC as ThreadPoolConsumer
+  participant EH as LogEventHandler
+  participant APP as LogAppender/FileAppender
+  participant FS as FileSystem
+
+  Client->>Controller: HTTP 请求
+  activate Controller
+  Controller->>AOP: 命中 @OperationLog (前置)
+  AOP-->>Controller: 放行业务方法
+  Controller->>ALS: asyncLogService.log(event)
+  ALS->>EQ: 提交/入队（视实现）
+  ALS-->>Controller: 返回（主线程不阻塞IO）
+  deactivate Controller
+
+  Note over CPC,EH: 服务启动后消费者线程池常驻
+  CPC->>EH: 拉取/接收事件
+  EH->>APP: append(event) 或 append(batch)
+  APP->>FS: 追加到 logs/async/async-log-YYYY-MM-DD.log
+  APP-->>EH: 成功/失败
+  EH-->>CPC: 计数+异常处理
+```
+
+## 定时任务时序图（Mermaid）
+
+```mermaid
+sequenceDiagram
+  participant Cron as @Scheduled(CRON)
+  participant Scan as Scanner
+  participant Rule as Rule Engine
+  participant Zip as Archiver(zip)
+  participant FS as FileSystem
+  participant Log as Logger
+
+  Cron->>Scan: 扫描 async.log.file.path
+  Scan->>Rule: 逐个文件(匹配 async-log-YYYY-MM-DD.log)
+  Rule-->>Scan: 判定 删除/归档/跳过
+  alt 删除
+    Scan->>FS: delete(file)
+    FS-->>Scan: OK/Fail
+  else 归档
+    Scan->>Zip: zip(file) -> archive.dir
+    Zip-->>Scan: OK/Fail
+    Scan->>FS: delete(source)
+  else 跳过
+    Scan-->>Log: skip
+  end
+  Scan->>Log: 汇总 archived/deleted/skipped/errors
+```
+
+> 归档策略说明：满足归档阈值的历史日志会被压缩为 zip 到 `async.log.archive.dir`，同时原始 `.log` 会被迁移到 `async.log.archive.raw-dir`，便于审计与对比。
+> 配置示例：
+```yaml
+async:
+  log:
+    archive:
+      enabled: true
+      dir: logs/archive
+      raw-dir: logs/archive/raw
+      days: 3
+      compress: zip
+```

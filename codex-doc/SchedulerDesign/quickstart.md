@@ -20,6 +20,7 @@
       archive:
         enabled: true
         dir: logs/archive
+        raw-dir: logs/archive/raw
         days: 1
         compress: zip
       file:
@@ -38,6 +39,7 @@
       archive:
         enabled: true
         dir: logs/archive
+        raw-dir: logs/archive/raw
         days: 3             # 建议 < retention.days
         compress: zip
       file:

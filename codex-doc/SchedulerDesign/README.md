@@ -134,5 +134,8 @@ async:
 
 附：文档导航
 - 参数说明：parameters.md
+- Cron 速查表：cron_guide.md
 - 使用指南（启用/测试/回滚）：quickstart.md
 - 实现说明（原理与代码入口）：implementation.md
+- 故障排查：troubleshooting.md
+- 规划（Roadmap）：roadmap.md
