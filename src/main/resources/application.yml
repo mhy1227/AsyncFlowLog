@@ -43,6 +43,23 @@ async:
       batch-size: 100
       flush-interval: 1000
 
+    # 测试配置：每 15 秒执行一次（验证后建议改回每日 02:05）
+    maintenance:
+      enabled: true
+      cron: "0/15 * * * * ?"
+#       cron: "0 5 2 * * ?"
+      timezone: "Asia/Shanghai"
+    retention:
+      days: 7
+    archive:
+      enabled: true
+      dir: logs/archive
+      days: 1
+      compress: zip
+      raw-dir: logs/archive/raw
+    file:
+      path: logs/async
+
 management:
   endpoints:
     web:
